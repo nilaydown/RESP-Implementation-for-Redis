@@ -158,3 +158,40 @@ func TestTTLValues(t *testing.T) {
 		t.Fatalf("expected TTL ~10, got %d", ttl)
 	}
 }
+
+func TestKeysAll(t *testing.T) {
+	s := NewStore()
+	s.Set("a", "1", 0)
+	s.Set("b", "2", 0)
+	s.Set("c", "3", 0)
+
+	keys := s.Keys("*")
+	if len(keys) != 3 {
+		t.Fatalf("expected 3 keys, got %d", len(keys))
+	}
+}
+
+func TestKeysPattern(t *testing.T) {
+	s := NewStore()
+	s.Set("user:1", "alice", 0)
+	s.Set("user:2", "bob", 0)
+	s.Set("session:1", "data", 0)
+
+	keys := s.Keys("user:*")
+	if len(keys) != 2 {
+		t.Fatalf("expected 2 keys matching user:*, got %d", len(keys))
+	}
+}
+
+func TestKeysExcludesExpired(t *testing.T) {
+	s := NewStore()
+	s.Set("alive", "yes", 0)
+	s.Set("dying", "soon", 50*time.Millisecond)
+
+	time.Sleep(100 * time.Millisecond)
+
+	keys := s.Keys("*")
+	if len(keys) != 1 {
+		t.Fatalf("expected 1 key (expired excluded), got %d", len(keys))
+	}
+}
