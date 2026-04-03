@@ -109,6 +109,50 @@ func (s *Store) TTL(key string) int {
 	return int(remaining.Seconds())
 }
 
+// Keys returns all keys matching a glob-like pattern. Supports * as wildcard.
+// An empty pattern or "*" returns all non-expired keys.
+func (s *Store) Keys(pattern string) []string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	now := time.Now()
+	var result []string
+	for k, e := range s.data {
+		if e.hasTTL && now.After(e.expiresAt) {
+			continue
+		}
+		if pattern == "" || pattern == "*" || matchGlob(pattern, k) {
+			result = append(result, k)
+		}
+	}
+	return result
+}
+
+func matchGlob(pattern, s string) bool {
+	pi, si := 0, 0
+	starPi, starSi := -1, -1
+	for si < len(s) {
+		if pi < len(pattern) && (pattern[pi] == s[si] || pattern[pi] == '?') {
+			pi++
+			si++
+		} else if pi < len(pattern) && pattern[pi] == '*' {
+			starPi = pi
+			starSi = si
+			pi++
+		} else if starPi >= 0 {
+			pi = starPi + 1
+			starSi++
+			si = starSi
+		} else {
+			return false
+		}
+	}
+	for pi < len(pattern) && pattern[pi] == '*' {
+		pi++
+	}
+	return pi == len(pattern)
+}
+
 // Incr atomically increments the integer value at key by delta.
 // If the key does not exist, it is initialized to 0 before the operation.
 // Returns the new value or an error if the current value is not an integer.

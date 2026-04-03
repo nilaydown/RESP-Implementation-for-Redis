@@ -70,6 +70,9 @@ func HandleRequest(input string) string {
 	case "DECR":
 		return handleIncr(args, -1)
 
+	case "KEYS":
+		return handleKeys(args)
+
 	default:
 		return resp.Serialize(errors.New("Unknown command '" + *command + "'"))
 	}
@@ -192,4 +195,19 @@ func handleTTL(args []interface{}) string {
 		return resp.Serialize(errors.New("TTL key must be a string"))
 	}
 	return resp.Serialize(DefaultStore.TTL(*key))
+}
+
+func handleKeys(args []interface{}) string {
+	pattern := "*"
+	if len(args) > 0 {
+		if s, ok := args[0].(*string); ok {
+			pattern = *s
+		}
+	}
+	keys := DefaultStore.Keys(pattern)
+	result := make([]interface{}, len(keys))
+	for i, k := range keys {
+		result[i] = k
+	}
+	return resp.Serialize(result)
 }
