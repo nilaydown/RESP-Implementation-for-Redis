@@ -78,6 +78,68 @@ func TestTTLExpiry(t *testing.T) {
 	}
 }
 
+func TestIncrNewKey(t *testing.T) {
+	s := NewStore()
+	val, err := s.Incr("counter", 1)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if val != 1 {
+		t.Fatalf("expected 1, got %d", val)
+	}
+}
+
+func TestIncrExistingKey(t *testing.T) {
+	s := NewStore()
+	s.Set("counter", "10", 0)
+
+	val, err := s.Incr("counter", 1)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if val != 11 {
+		t.Fatalf("expected 11, got %d", val)
+	}
+}
+
+func TestDecrKey(t *testing.T) {
+	s := NewStore()
+	s.Set("counter", "10", 0)
+
+	val, err := s.Incr("counter", -1)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if val != 9 {
+		t.Fatalf("expected 9, got %d", val)
+	}
+}
+
+func TestIncrNonInteger(t *testing.T) {
+	s := NewStore()
+	s.Set("name", "alice", 0)
+
+	_, err := s.Incr("name", 1)
+	if err == nil {
+		t.Fatal("expected error for non-integer value")
+	}
+}
+
+func TestIncrExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("counter", "10", 50*time.Millisecond)
+
+	time.Sleep(100 * time.Millisecond)
+
+	val, err := s.Incr("counter", 1)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if val != 1 {
+		t.Fatalf("expected 1 (expired key treated as new), got %d", val)
+	}
+}
+
 func TestTTLValues(t *testing.T) {
 	s := NewStore()
 

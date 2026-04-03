@@ -64,6 +64,12 @@ func HandleRequest(input string) string {
 	case "TTL":
 		return handleTTL(args)
 
+	case "INCR":
+		return handleIncr(args, 1)
+
+	case "DECR":
+		return handleIncr(args, -1)
+
 	default:
 		return resp.Serialize(errors.New("Unknown command '" + *command + "'"))
 	}
@@ -159,6 +165,22 @@ func handleExists(args []interface{}) string {
 	}
 	count := DefaultStore.Exists(keys...)
 	return resp.Serialize(count)
+}
+
+func handleIncr(args []interface{}, delta int) string {
+	if len(args) < 1 {
+		return resp.Serialize(errors.New("INCR/DECR requires a key argument"))
+	}
+	key, ok := args[0].(*string)
+	if !ok {
+		return resp.Serialize(errors.New("INCR/DECR key must be a string"))
+	}
+
+	val, err := DefaultStore.Incr(*key, delta)
+	if err != nil {
+		return resp.Serialize(err)
+	}
+	return resp.Serialize(val)
 }
 
 func handleTTL(args []interface{}) string {

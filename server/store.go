@@ -1,6 +1,8 @@
 package server
 
 import (
+	"fmt"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -105,6 +107,31 @@ func (s *Store) TTL(key string) int {
 		return -2
 	}
 	return int(remaining.Seconds())
+}
+
+// Incr atomically increments the integer value at key by delta.
+// If the key does not exist, it is initialized to 0 before the operation.
+// Returns the new value or an error if the current value is not an integer.
+func (s *Store) Incr(key string, delta int) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	current := 0
+	if e, ok := s.data[key]; ok {
+		if e.hasTTL && time.Now().After(e.expiresAt) {
+			delete(s.data, key)
+		} else {
+			val, err := strconv.Atoi(e.value)
+			if err != nil {
+				return 0, fmt.Errorf("value is not an integer or out of range")
+			}
+			current = val
+		}
+	}
+
+	current += delta
+	s.data[key] = entry{value: strconv.Itoa(current)}
+	return current, nil
 }
 
 func (s *Store) evictLoop() {
