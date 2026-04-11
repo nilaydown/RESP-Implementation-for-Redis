@@ -73,6 +73,15 @@ func HandleRequest(input string) string {
 	case "KEYS":
 		return handleKeys(args)
 
+	case "MGET":
+		return handleMGet(args)
+
+	case "MSET":
+		return handleMSet(args)
+
+	case "EXPIRE":
+		return handleExpire(args)
+
 	default:
 		return resp.Serialize(errors.New("Unknown command '" + *command + "'"))
 	}
@@ -195,6 +204,89 @@ func handleTTL(args []interface{}) string {
 		return resp.Serialize(errors.New("TTL key must be a string"))
 	}
 	return resp.Serialize(DefaultStore.TTL(*key))
+}
+
+func handleMGet(args []interface{}) string {
+	if len(args) < 1 {
+		return resp.Serialize(errors.New("MGET requires at least one key"))
+	}
+
+	keys := make([]string, 0, len(args))
+	for _, a := range args {
+		if s, ok := a.(*string); ok {
+			keys = append(keys, *s)
+		}
+	}
+
+	results := DefaultStore.MGet(keys...)
+	array := make([]interface{}, len(results))
+	for i, r := range results {
+		if r.Found {
+			array[i] = r.Value
+		} else {
+			array[i] = nil
+		}
+	}
+	return serializeNullableArray(array)
+}
+
+func handleMSet(args []interface{}) string {
+	if len(args) < 2 || len(args)%2 != 0 {
+		return resp.Serialize(errors.New("MSET requires an even number of arguments (key value pairs)"))
+	}
+
+	pairs := make(map[string]string, len(args)/2)
+	for i := 0; i < len(args); i += 2 {
+		key, ok := args[i].(*string)
+		if !ok {
+			return resp.Serialize(errors.New("MSET key must be a string"))
+		}
+		val, ok := args[i+1].(*string)
+		if !ok {
+			return resp.Serialize(errors.New("MSET value must be a string"))
+		}
+		pairs[*key] = *val
+	}
+
+	DefaultStore.MSet(pairs)
+	return resp.Serialize("OK")
+}
+
+func handleExpire(args []interface{}) string {
+	if len(args) < 2 {
+		return resp.Serialize(errors.New("EXPIRE requires key and seconds arguments"))
+	}
+
+	key, ok := args[0].(*string)
+	if !ok {
+		return resp.Serialize(errors.New("EXPIRE key must be a string"))
+	}
+	secStr, ok := args[1].(*string)
+	if !ok {
+		return resp.Serialize(errors.New("EXPIRE seconds must be a string-encoded integer"))
+	}
+	sec, err := strconv.Atoi(*secStr)
+	if err != nil || sec <= 0 {
+		return resp.Serialize(errors.New("EXPIRE seconds must be a positive integer"))
+	}
+
+	if DefaultStore.Expire(*key, time.Duration(sec)*time.Second) {
+		return resp.Serialize(1)
+	}
+	return resp.Serialize(0)
+}
+
+// serializeNullableArray serializes an array where nil elements become RESP null bulk strings.
+func serializeNullableArray(elements []interface{}) string {
+	result := "*" + strconv.Itoa(len(elements)) + "\r\n"
+	for _, e := range elements {
+		if e == nil {
+			result += "$-1\r\n"
+		} else {
+			result += resp.Serialize(e)
+		}
+	}
+	return result
 }
 
 func handleKeys(args []interface{}) string {
