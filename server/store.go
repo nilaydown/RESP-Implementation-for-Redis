@@ -178,6 +178,62 @@ func (s *Store) Incr(key string, delta int) (int, error) {
 	return current, nil
 }
 
+// MGet returns values for multiple keys. Missing/expired keys return empty string with found=false.
+func (s *Store) MGet(keys ...string) []struct {
+	Value string
+	Found bool
+} {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	now := time.Now()
+	results := make([]struct {
+		Value string
+		Found bool
+	}, len(keys))
+	for i, k := range keys {
+		if e, ok := s.data[k]; ok {
+			if e.hasTTL && now.After(e.expiresAt) {
+				continue
+			}
+			results[i] = struct {
+				Value string
+				Found bool
+			}{e.value, true}
+		}
+	}
+	return results
+}
+
+// MSet sets multiple key-value pairs atomically.
+func (s *Store) MSet(pairs map[string]string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for k, v := range pairs {
+		s.data[k] = entry{value: v}
+	}
+}
+
+// Expire sets a TTL on an existing key. Returns true if the key exists, false otherwise.
+func (s *Store) Expire(key string, ttl time.Duration) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	e, ok := s.data[key]
+	if !ok {
+		return false
+	}
+	if e.hasTTL && time.Now().After(e.expiresAt) {
+		delete(s.data, key)
+		return false
+	}
+	e.expiresAt = time.Now().Add(ttl)
+	e.hasTTL = true
+	s.data[key] = e
+	return true
+}
+
 func (s *Store) evictLoop() {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
