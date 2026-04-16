@@ -18,6 +18,17 @@ This project is a Redis server implementation written in Go, aiming to replicate
 Currently implemented commands:
 - `PING` - Returns PONG
 - `ECHO <message>` - Returns the message
+- `SET <key> <value> [EX <seconds>]` - Set a key-value pair with optional expiration
+- `GET <key>` - Get the value of a key
+- `DEL <key> [key ...]` - Delete one or more keys
+- `EXISTS <key> [key ...]` - Check if one or more keys exist
+- `TTL <key>` - Get the time-to-live of a key in seconds
+- `INCR <key>` - Increment the integer value of a key by 1
+- `DECR <key>` - Decrement the integer value of a key by 1
+- `KEYS <pattern>` - Get all keys matching a pattern (supports wildcards)
+- `MGET <key> [key ...]` - Get the values of multiple keys
+- `MSET <key> <value> [key value ...]` - Set multiple key-value pairs
+- `EXPIRE <key> <seconds>` - Set expiration time for a key
 
 ### Client Interface
 - Interactive command-line interface
@@ -26,17 +37,11 @@ Currently implemented commands:
 - Error handling and display
 
 ## Planned Features
-- Key-Value Store Operations:
-  - SET
-  - GET
-  - DEL
-  - EXISTS
 - Data Structure Commands:
   - Lists (LPUSH, RPUSH, LPOP, RPOP)
   - Sets (SADD, SREM, SMEMBERS)
   - Hashes (HSET, HGET, HDEL)
 - Persistence
-- TTL Support
 - Pub/Sub System
 
 ## Project Structure 
