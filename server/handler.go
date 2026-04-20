@@ -82,6 +82,9 @@ func HandleRequest(input string) string {
 	case "EXPIRE":
 		return handleExpire(args)
 
+	case "APPEND":
+		return handleAppend(args)
+
 	default:
 		return resp.Serialize(errors.New("Unknown command '" + *command + "'"))
 	}
@@ -302,4 +305,23 @@ func handleKeys(args []interface{}) string {
 		result[i] = k
 	}
 	return resp.Serialize(result)
+}
+
+// handleAppend implements APPEND key value.
+// It appends value to the string stored at key (creating the key if absent)
+// and returns the new length of the string as a RESP integer.
+func handleAppend(args []interface{}) string {
+	if len(args) != 2 {
+		return resp.Serialize(errors.New("APPEND requires exactly 2 arguments: key value"))
+	}
+	key, ok := args[0].(*string)
+	if !ok {
+		return resp.Serialize(errors.New("APPEND key must be a string"))
+	}
+	value, ok := args[1].(*string)
+	if !ok {
+		return resp.Serialize(errors.New("APPEND value must be a string"))
+	}
+	newLen := DefaultStore.Append(*key, *value)
+	return resp.Serialize(newLen)
 }

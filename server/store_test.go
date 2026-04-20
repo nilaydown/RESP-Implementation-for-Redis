@@ -195,3 +195,58 @@ func TestKeysExcludesExpired(t *testing.T) {
 		t.Fatalf("expected 1 key (expired excluded), got %d", len(keys))
 	}
 }
+
+func TestAppendNewKey(t *testing.T) {
+	s := NewStore()
+	n := s.Append("msg", "hello")
+	if n != 5 {
+		t.Fatalf("expected length 5, got %d", n)
+	}
+	val, ok := s.Get("msg")
+	if !ok || val != "hello" {
+		t.Fatalf("expected 'hello', got %q (ok=%v)", val, ok)
+	}
+}
+
+func TestAppendExistingKey(t *testing.T) {
+	s := NewStore()
+	s.Set("msg", "hello", 0)
+	n := s.Append("msg", " world")
+	if n != 11 {
+		t.Fatalf("expected length 11, got %d", n)
+	}
+	val, ok := s.Get("msg")
+	if !ok || val != "hello world" {
+		t.Fatalf("expected 'hello world', got %q (ok=%v)", val, ok)
+	}
+}
+
+func TestAppendMultipleTimes(t *testing.T) {
+	s := NewStore()
+	s.Append("k", "foo")
+	s.Append("k", "bar")
+	n := s.Append("k", "baz")
+	if n != 9 {
+		t.Fatalf("expected length 9, got %d", n)
+	}
+	val, _ := s.Get("k")
+	if val != "foobarbaz" {
+		t.Fatalf("expected 'foobarbaz', got %q", val)
+	}
+}
+
+func TestAppendExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "old", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	// After expiry, APPEND should treat the key as absent and start fresh.
+	n := s.Append("k", "new")
+	if n != 3 {
+		t.Fatalf("expected length 3 (expired key treated as absent), got %d", n)
+	}
+	val, ok := s.Get("k")
+	if !ok || val != "new" {
+		t.Fatalf("expected 'new', got %q (ok=%v)", val, ok)
+	}
+}

@@ -178,6 +178,24 @@ func (s *Store) Incr(key string, delta int) (int, error) {
 	return current, nil
 }
 
+// Append appends value to the existing string stored at key and returns the
+// new length. If the key does not exist it is created with value as its
+// content. The entire read-then-write is performed under a single write lock.
+func (s *Store) Append(key, value string) int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	existing := ""
+	if e, ok := s.data[key]; ok {
+		if !e.hasTTL || !time.Now().After(e.expiresAt) {
+			existing = e.value
+		}
+	}
+	newVal := existing + value
+	s.data[key] = entry{value: newVal}
+	return len(newVal)
+}
+
 // MGet returns values for multiple keys. Missing/expired keys return empty string with found=false.
 func (s *Store) MGet(keys ...string) []struct {
 	Value string
