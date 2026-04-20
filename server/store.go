@@ -178,6 +178,39 @@ func (s *Store) Incr(key string, delta int) (int, error) {
 	return current, nil
 }
 
+// SetNX sets key to value only if the key does not already exist.
+// Returns true if the key was set, false if it already existed.
+// The check-and-set is performed atomically under a single write lock.
+func (s *Store) SetNX(key, value string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if e, ok := s.data[key]; ok {
+		if !e.hasTTL || time.Now().Before(e.expiresAt) {
+			return false
+		}
+	}
+	s.data[key] = entry{value: value}
+	return true
+}
+
+// GetSet atomically sets key to value and returns the old value.
+// Returns (oldValue, true) if the key existed, or ("", false) if it did not.
+// The read-then-write is performed atomically under a single write lock.
+func (s *Store) GetSet(key, value string) (string, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	old, found := "", false
+	if e, ok := s.data[key]; ok {
+		if !e.hasTTL || time.Now().Before(e.expiresAt) {
+			old, found = e.value, true
+		}
+	}
+	s.data[key] = entry{value: value}
+	return old, found
+}
+
 // MGet returns values for multiple keys. Missing/expired keys return empty string with found=false.
 func (s *Store) MGet(keys ...string) []struct {
 	Value string
