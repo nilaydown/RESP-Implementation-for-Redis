@@ -195,3 +195,60 @@ func TestKeysExcludesExpired(t *testing.T) {
 		t.Fatalf("expected 1 key (expired excluded), got %d", len(keys))
 	}
 }
+
+func TestSetNXMissingKey(t *testing.T) {
+	s := NewStore()
+	ok := s.SetNX("newkey", "hello")
+	if !ok {
+		t.Fatal("SetNX on missing key should return true")
+	}
+	val, found := s.Get("newkey")
+	if !found || val != "hello" {
+		t.Fatalf("expected stored value 'hello', got %q (found=%v)", val, found)
+	}
+}
+
+func TestSetNXExistingKey(t *testing.T) {
+	s := NewStore()
+	s.Set("existing", "original", 0)
+	ok := s.SetNX("existing", "new")
+	if ok {
+		t.Fatal("SetNX on existing key should return false")
+	}
+	val, found := s.Get("existing")
+	if !found || val != "original" {
+		t.Fatalf("expected value to remain 'original', got %q (found=%v)", val, found)
+	}
+}
+
+func TestGetSetMissingKey(t *testing.T) {
+	s := NewStore()
+	old, found := s.GetSet("missing", "newval")
+	if found {
+		t.Fatal("GetSet on missing key should return found=false")
+	}
+	if old != "" {
+		t.Fatalf("GetSet on missing key should return empty string, got %q", old)
+	}
+	// New value should be stored
+	val, ok := s.Get("missing")
+	if !ok || val != "newval" {
+		t.Fatalf("expected stored value 'newval', got %q (ok=%v)", val, ok)
+	}
+}
+
+func TestGetSetExistingKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "oldval", 0)
+	old, found := s.GetSet("k", "newval")
+	if !found {
+		t.Fatal("GetSet on existing key should return found=true")
+	}
+	if old != "oldval" {
+		t.Fatalf("expected old value 'oldval', got %q", old)
+	}
+	val, ok := s.Get("k")
+	if !ok || val != "newval" {
+		t.Fatalf("expected new stored value 'newval', got %q (ok=%v)", val, ok)
+	}
+}

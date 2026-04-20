@@ -82,6 +82,12 @@ func HandleRequest(input string) string {
 	case "EXPIRE":
 		return handleExpire(args)
 
+	case "SETNX":
+		return handleSetNX(args)
+
+	case "GETSET":
+		return handleGetSet(args)
+
 	default:
 		return resp.Serialize(errors.New("Unknown command '" + *command + "'"))
 	}
@@ -302,4 +308,48 @@ func handleKeys(args []interface{}) string {
 		result[i] = k
 	}
 	return resp.Serialize(result)
+}
+
+// handleSetNX implements SETNX key value.
+// Returns integer 1 if the key was set, 0 if it already existed.
+func handleSetNX(args []interface{}) string {
+	if len(args) != 2 {
+		return resp.Serialize(errors.New("SETNX requires exactly 2 arguments: key value"))
+	}
+	key, ok := args[0].(*string)
+	if !ok {
+		return resp.Serialize(errors.New("SETNX key must be a string"))
+	}
+	value, ok := args[1].(*string)
+	if !ok {
+		return resp.Serialize(errors.New("SETNX value must be a string"))
+	}
+
+	if DefaultStore.SetNX(*key, *value) {
+		return resp.Serialize(1)
+	}
+	return resp.Serialize(0)
+}
+
+// handleGetSet implements GETSET key value.
+// Atomically sets key to value and returns the old value as a RESP bulk string,
+// or nil if the key did not exist.
+func handleGetSet(args []interface{}) string {
+	if len(args) != 2 {
+		return resp.Serialize(errors.New("GETSET requires exactly 2 arguments: key value"))
+	}
+	key, ok := args[0].(*string)
+	if !ok {
+		return resp.Serialize(errors.New("GETSET key must be a string"))
+	}
+	value, ok := args[1].(*string)
+	if !ok {
+		return resp.Serialize(errors.New("GETSET value must be a string"))
+	}
+
+	old, found := DefaultStore.GetSet(*key, *value)
+	if !found {
+		return "$-1\r\n"
+	}
+	return resp.Serialize(old)
 }
