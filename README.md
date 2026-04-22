@@ -113,10 +113,10 @@ The RESP protocol is implemented in the `resp` package with the following compon
 4. Push to the branch
 5. Create a Pull Request
 
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## Acknowledgments
 - Redis Protocol Specification: [Redis Protocol](https://redis.io/topics/protocol)
 - Go Programming Language: [golang.org](https://golang.org)
+
+## License
+This repository is licensed under the MIT License. You are free to use, modify, and distribute this software with proper attribution; see the LICENSE file for the full terms.
 
