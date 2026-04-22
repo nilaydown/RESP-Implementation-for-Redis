@@ -1,5 +1,7 @@
 # Redis Server Implementation in Go
 
+**Status:** This is a toy Redis implementation built for learning purposes and is not intended for production use.
+
 ## Overview
 This project is a Redis server implementation written in Go, aiming to replicate core Redis functionality. It implements the RESP (Redis Serialization Protocol) for client-server communication and provides a command-line interface for interacting with the server.
 
