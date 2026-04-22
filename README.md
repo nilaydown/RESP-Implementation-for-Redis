@@ -16,8 +16,22 @@ This project is a Redis server implementation written in Go, aiming to replicate
 
 ### Supported Commands
 Currently implemented commands:
-- `PING` - Returns PONG
-- `ECHO <message>` - Returns the message
+
+| Command | Description |
+|---------|-------------|
+| `PING` | Returns `PONG`; confirms the server is alive |
+| `ECHO message` | Returns the given message back to the client |
+| `SET key value [EX seconds]` | Sets `key` to `value`, with an optional expiry in seconds |
+| `GET key` | Returns the value of `key`, or a null bulk string if the key does not exist |
+| `DEL key [key ...]` | Deletes one or more keys; returns the number of keys actually removed |
+| `EXISTS key [key ...]` | Returns the number of the specified keys that exist (and have not expired) |
+| `TTL key` | Returns the remaining time-to-live in seconds (`-1` = no expiry, `-2` = key not found) |
+| `EXPIRE key seconds` | Sets a timeout on `key`; returns `1` if set, `0` if the key does not exist |
+| `INCR key` | Atomically increments the integer value of `key` by 1 (initialises to 0 if absent) |
+| `DECR key` | Atomically decrements the integer value of `key` by 1 (initialises to 0 if absent) |
+| `KEYS pattern` | Returns all keys matching a glob-style pattern (`*` returns every key) |
+| `MGET key [key ...]` | Returns the values of multiple keys in order (null for missing/expired keys) |
+| `MSET key value [key value ...]` | Sets multiple key-value pairs atomically in a single call |
 
 ### Client Interface
 - Interactive command-line interface
