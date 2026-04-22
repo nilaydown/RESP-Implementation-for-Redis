@@ -1,5 +1,8 @@
 # Redis Server Implementation in Go
 
+## Project Status
+**Active Development** — Core RESP protocol and basic commands (PING, ECHO) are implemented. Key-value store operations and additional data structures are planned.
+
 ## Overview
 This project is a Redis server implementation written in Go, aiming to replicate core Redis functionality. It implements the RESP (Redis Serialization Protocol) for client-server communication and provides a command-line interface for interacting with the server.
 
