@@ -1,3 +1,4 @@
+<!-- Short note: minor README comment added. -->
 # Redis Server Implementation in Go
 
 ## Overview
