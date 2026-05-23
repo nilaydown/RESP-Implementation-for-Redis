@@ -234,6 +234,30 @@ func (s *Store) Expire(key string, ttl time.Duration) bool {
 	return true
 }
 
+// Persist removes the TTL from a key, making it persistent again.
+// Returns true only if the key exists, is not expired, and had a TTL set.
+func (s *Store) Persist(key string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	e, ok := s.data[key]
+	if !ok {
+		return false
+	}
+	if e.hasTTL && time.Now().After(e.expiresAt) {
+		delete(s.data, key)
+		return false
+	}
+	if !e.hasTTL {
+		return false
+	}
+	// Clear TTL
+	e.hasTTL = false
+	e.expiresAt = time.Time{}
+	s.data[key] = e
+	return true
+}
+
 func (s *Store) evictLoop() {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()

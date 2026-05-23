@@ -36,7 +36,8 @@ Currently implemented commands:
   - Sets (SADD, SREM, SMEMBERS)
   - Hashes (HSET, HGET, HDEL)
 - Persistence
-- TTL Support
+- TTL Support (TTL, EXPIRE, PERSIST)
+  - PERSIST removes the TTL from a key (returns 1 if removed, 0 otherwise)
 - Pub/Sub System
 
 ## Project Structure 
