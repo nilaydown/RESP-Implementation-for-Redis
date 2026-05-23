@@ -234,6 +234,27 @@ func (s *Store) Expire(key string, ttl time.Duration) bool {
 	return true
 }
 
+func (s *Store) Persist(key string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	e, ok := s.data[key]
+	if !ok {
+		return false
+	}
+	if e.hasTTL && time.Now().After(e.expiresAt) {
+		delete(s.data, key)
+		return false
+	}
+	if !e.hasTTL {
+		return false
+	}
+	e.hasTTL = false
+	e.expiresAt = time.Time{}
+	s.data[key] = e
+	return true
+}
+
 func (s *Store) evictLoop() {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()

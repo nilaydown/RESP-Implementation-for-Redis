@@ -1,0 +1,1 @@
+Add Store.Persist to remove TTL from a key, with tests and README note
