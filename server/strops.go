@@ -10,8 +10,8 @@ import (
 // new length of the value. If the key does not exist, it is created with
 // suffix as its value (like Redis APPEND).
 func (s *Store) Append(key, suffix string) int {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	existing := s.data[key]
 	newValue := existing.value + suffix
@@ -21,7 +21,7 @@ func (s *Store) Append(key, suffix string) int {
 
 // handleAppend implements APPEND key value.
 func handleAppend(args []interface{}) string {
-	if len(args) < 1 {
+	if len(args) < 2 {
 		return resp.Serialize(errors.New("APPEND requires a key and a value"))
 	}
 
