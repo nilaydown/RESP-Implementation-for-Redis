@@ -10,8 +10,8 @@ import (
 // previously stored there (and whether a previous value existed), matching
 // Redis GETSET.
 func (s *Store) GetSet(key, newValue string) (string, bool) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	previous, existed := s.data[key]
 	s.data[key] = entry{value: newValue}
@@ -20,7 +20,7 @@ func (s *Store) GetSet(key, newValue string) (string, bool) {
 
 // handleGetSet implements GETSET key value.
 func handleGetSet(args []interface{}) string {
-	if len(args) < 1 {
+	if len(args) < 2 {
 		return resp.Serialize(errors.New("GETSET requires a key and a value"))
 	}
 
