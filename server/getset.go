@@ -15,7 +15,7 @@ func (s *Store) GetSet(key, newValue string) (string, bool) {
 
 	previous, existed := s.data[key]
 	s.data[key] = entry{value: newValue}
-	return newValue, existed
+	return previous.value, existed
 }
 
 // handleGetSet implements GETSET key value.
