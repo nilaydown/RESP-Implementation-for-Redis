@@ -49,7 +49,7 @@ func (s *Store) Get(key string) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	if e.hasTTL && time.Now().After(e.expiresAt) {
+	if e.hasTTL && !time.Now().Before(e.expiresAt) {
 		s.Del(key)
 		return "", false
 	}
@@ -162,7 +162,7 @@ func (s *Store) Incr(key string, delta int) (int, error) {
 
 	current := 0
 	if e, ok := s.data[key]; ok {
-		if e.hasTTL && time.Now().After(e.expiresAt) {
+		if e.hasTTL && !time.Now().Before(e.expiresAt) {
 			delete(s.data, key)
 		} else {
 			val, err := strconv.Atoi(e.value)
@@ -224,7 +224,7 @@ func (s *Store) Expire(key string, ttl time.Duration) bool {
 	if !ok {
 		return false
 	}
-	if e.hasTTL && time.Now().After(e.expiresAt) {
+	if e.hasTTL && !time.Now().Before(e.expiresAt) {
 		delete(s.data, key)
 		return false
 	}
@@ -242,7 +242,7 @@ func (s *Store) Persist(key string) bool {
 	if !ok {
 		return false
 	}
-	if e.hasTTL && time.Now().After(e.expiresAt) {
+	if e.hasTTL && !time.Now().Before(e.expiresAt) {
 		delete(s.data, key)
 		return false
 	}
