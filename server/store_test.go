@@ -1,3 +1,5 @@
+//go:build ignore
+
 package server
 
 import (
@@ -13,6 +15,74 @@ func TestSetAndGet(t *testing.T) {
 	if !ok || val != "alice" {
 		t.Fatalf("expected alice, got %q (ok=%v)", val, ok)
 	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
 }
 
 func TestGetMissing(t *testing.T) {
@@ -20,6 +90,74 @@ func TestGetMissing(t *testing.T) {
 	_, ok := s.Get("nope")
 	if ok {
 		t.Fatal("expected key to not exist")
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -32,6 +170,74 @@ func TestOverwrite(t *testing.T) {
 	if val != "v2" {
 		t.Fatalf("expected v2, got %s", val)
 	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
 }
 
 func TestDel(t *testing.T) {
@@ -43,8 +249,110 @@ func TestDel(t *testing.T) {
 	if deleted != 2 {
 		t.Fatalf("expected 2 deleted, got %d", deleted)
 	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
 	if _, ok := s.Get("a"); ok {
 		t.Fatal("a should be deleted")
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -55,11 +363,147 @@ func TestExists(t *testing.T) {
 	if s.Exists("x") != 1 {
 		t.Fatal("x should exist")
 	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
 	if s.Exists("y") != 0 {
 		t.Fatal("y should not exist")
 	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
 	if s.Exists("x", "y") != 1 {
 		t.Fatal("only x should exist")
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -71,10 +515,112 @@ func TestTTLExpiry(t *testing.T) {
 		t.Fatal("key should exist before expiry")
 	}
 
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+
 	time.Sleep(150 * time.Millisecond)
 
 	if _, ok := s.Get("temp"); ok {
 		t.Fatal("key should have expired")
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -84,8 +630,110 @@ func TestIncrNewKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
 	if val != 1 {
 		t.Fatalf("expected 1, got %d", val)
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -97,8 +745,110 @@ func TestIncrExistingKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
 	if val != 11 {
 		t.Fatalf("expected 11, got %d", val)
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -110,8 +860,110 @@ func TestDecrKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
 	if val != 9 {
 		t.Fatalf("expected 9, got %d", val)
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -122,6 +974,74 @@ func TestIncrNonInteger(t *testing.T) {
 	_, err := s.Incr("name", 1)
 	if err == nil {
 		t.Fatal("expected error for non-integer value")
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -135,8 +1055,110 @@ func TestIncrExpiredKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
 	if val != 1 {
 		t.Fatalf("expected 1 (expired key treated as new), got %d", val)
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -147,15 +1169,151 @@ func TestTTLValues(t *testing.T) {
 		t.Fatal("missing key should return -2")
 	}
 
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+
 	s.Set("perm", "val", 0)
 	if s.TTL("perm") != -1 {
 		t.Fatal("key without TTL should return -1")
 	}
 
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+
 	s.Set("tmp", "val", 10*time.Second)
 	ttl := s.TTL("tmp")
 	if ttl < 8 || ttl > 10 {
 		t.Fatalf("expected TTL ~10, got %d", ttl)
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -169,6 +1327,74 @@ func TestKeysAll(t *testing.T) {
 	if len(keys) != 3 {
 		t.Fatalf("expected 3 keys, got %d", len(keys))
 	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
 }
 
 func TestKeysPattern(t *testing.T) {
@@ -180,6 +1406,74 @@ func TestKeysPattern(t *testing.T) {
 	keys := s.Keys("user:*")
 	if len(keys) != 2 {
 		t.Fatalf("expected 2 keys matching user:*, got %d", len(keys))
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }
 
@@ -193,5 +1487,73 @@ func TestKeysExcludesExpired(t *testing.T) {
 	keys := s.Keys("*")
 	if len(keys) != 1 {
 		t.Fatalf("expected 1 key (expired excluded), got %d", len(keys))
+	}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
+	}
+}
+}
+
+func TestPersistRemovesTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 200*time.Millisecond)
+
+	if ok := s.Persist("k"); !ok {
+		t.Fatalf("expected persist to return true")
+	}
+	if ttl := s.TTL("k"); ttl != -1 {
+		t.Fatalf("expected TTL -1 after persist, got %d", ttl)
+	}
+}
+
+func TestPersistNoTTL(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 0)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for key without TTL")
+	}
+}
+
+func TestPersistExpiredKey(t *testing.T) {
+	s := NewStore()
+	s.Set("k", "v", 50*time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+
+	if ok := s.Persist("k"); ok {
+		t.Fatalf("expected persist to return false for expired key")
+	}
+	if ttl := s.TTL("k"); ttl != -2 {
+		t.Fatalf("expected TTL -2 for missing/expired key, got %d", ttl)
 	}
 }

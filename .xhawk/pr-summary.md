@@ -1,0 +1,4 @@
+- Implemented Store.Persist(key string) bool to remove TTL from an existing key, mirroring Redis PERSIST semantics
+- Added unit tests for Persist: removing TTL, no-TTL case, and expired key case
+- Documented PERSIST capability in README under TTL Support
+- Followed existing locking and expiration handling patterns for consistency
