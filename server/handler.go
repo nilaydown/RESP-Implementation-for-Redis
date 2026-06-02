@@ -82,6 +82,9 @@ func HandleRequest(input string) string {
 	case "EXPIRE":
 		return handleExpire(args)
 
+	case "APPEND":
+		return handleAppend(args)
+
 	default:
 		return resp.Serialize(errors.New("Unknown command '" + *command + "'"))
 	}
