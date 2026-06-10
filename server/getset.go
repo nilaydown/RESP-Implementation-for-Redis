@@ -36,7 +36,7 @@ func handleGetSet(args []interface{}) string {
 
 	old, existed := DefaultStore.GetSet(*key, *value)
 	if !existed {
-		return resp.Serialize(nil)
+		return "$-1\r\n"
 	}
 	return resp.Serialize(old)
 }
