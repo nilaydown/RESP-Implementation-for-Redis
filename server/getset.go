@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"time"
 
 	"github.com/nilayrajderkar/redis-implementation/resp"
 )
@@ -13,9 +14,18 @@ func (s *Store) GetSet(key, newValue string) (string, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	previous, existed := s.data[key]
+	prev := ""
+	existed := false
+	if e, ok := s.data[key]; ok {
+		if e.hasTTL && time.Now().After(e.expiresAt) {
+			delete(s.data, key)
+		} else {
+			prev = e.value
+			existed = true
+		}
+	}
 	s.data[key] = entry{value: newValue}
-	return previous.value, existed
+	return prev, existed
 }
 
 // handleGetSet implements GETSET key value.
