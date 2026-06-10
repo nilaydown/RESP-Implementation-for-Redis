@@ -55,7 +55,10 @@ func HandleRequest(input string) string {
 	case "GET":
 		return handleGet(args)
 
-	case "DEL":
+	case "GETSET":
+			return handleGetSet(args)
+
+		case "DEL":
 		return handleDel(args)
 
 	case "EXISTS":
